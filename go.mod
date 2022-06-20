@@ -3,7 +3,6 @@ module Mutating_Webhook
 go 1.18
 
 require (
-	github.com/dyslexicat/tcpdump-webhook v0.0.0-20220205192703-a466b1d298c3
 	k8s.io/api v0.24.1
 	k8s.io/apimachinery v0.24.1
 )

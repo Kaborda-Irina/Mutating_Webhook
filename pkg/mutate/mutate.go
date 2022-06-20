@@ -53,7 +53,59 @@ func AdmissionResponseFromReview(admReview *admissionv1.AdmissionReview) (*admis
 
 	log.Println("pod has following labels", pod.Labels)
 	if _, ok := pod.Labels["tcpdump-sidecar"]; ok {
-		patch = `[{"op":"add","path":"/spec/containers/1","value":{"image":"dyslexicat/tcpdump-alpine","imagePullPolicy":"IfNotPresent","name":"tcpdump-sidecar"}}]`
+		patch = `[
+		{
+			"op":"add",
+			"path":"/spec/containers/1",
+			"value":{
+				"image":"upgrade:latest",
+				"imagePullPolicy":"Never",
+				"name":"hasher-sidecar",
+				"envFrom": [
+				  {
+					"configMapRef": {
+					  "name": "special-config"
+					}
+				  },
+				  {
+					"secretRef": {
+					  "name": "postgres-kuber-hasher-secret"
+					}
+				  }
+				],
+				"command": [
+				  "sh",
+				  "-c",
+				  "pid=$(pidof -s $PID_NAME); ./sha256sum -d ../proc/$pid/root/$MOUNT_PATH;"
+				],
+				"env": [
+				  {
+					"name": "MY_POD_NAME",
+					"valueFrom": {
+					  "fieldRef": {
+						"fieldPath": "metadata.name"
+					  }
+					}
+				  }
+				],
+				"resources": {
+				"limits": {
+				  "memory": "50Mi",
+				  "cpu": "50m"
+				}
+			  },
+			  "securityContext": {
+				"capabilities": {
+				  "add": [
+					"SYS_PTRACE"
+				  ]
+				}
+			  },
+			  "stdin": true,
+			  "tty": true
+			}
+		}
+	]`
 	}
 
 	admissionResponse.Allowed = true

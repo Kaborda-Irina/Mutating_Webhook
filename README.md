@@ -1,3 +1,4 @@
+```
 cfssl gencert -initca ./tls/ca-csr.json | cfssljson -bare /tmp/ca
 
 cfssl gencert \
@@ -26,3 +27,4 @@ kubectl apply -f manifests/webhook-deployment.yaml
 kubectl apply -f manifests/webhook-configuration.yaml
 
 kubectl apply -f manifests/test-pod.yaml
+```

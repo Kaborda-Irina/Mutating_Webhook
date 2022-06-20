@@ -5,9 +5,17 @@ metadata:
     run: test-demo
     tcpdump-sidecar: "true"
   name: test-demo
-  #namespace: webhook-demo
- # namespace: default
 spec:
+  shareProcessNamespace: true
   containers:
-    - image: nginx
-      name: test-demo
+    - name: nginx
+      image: nginx
+      stdin: true
+      tty: true
+      volumeMounts:
+          - mountPath: /etc/nginx/data
+            name: nginx-persistent-storage
+  volumes:
+    - name: nginx-persistent-storage
+      persistentVolumeClaim:
+        claimName: nginx-persistent-volume-claim
